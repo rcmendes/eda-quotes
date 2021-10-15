@@ -6,26 +6,26 @@ import (
 	"github.com/google/uuid"
 )
 
-type QuoteApplicationService struct {
+type QuotesApplicationService struct {
 	publisher     eda.CommandPublisher
-	quotesService service.QuoteService
+	quotesService service.QuotesService
 }
 
-func NewQuoteApplicationService(publisher eda.CommandPublisher, quotesService service.QuoteService) *QuoteApplicationService {
-	return &QuoteApplicationService{
+func NewQuotesApplicationService(publisher eda.CommandPublisher, quotesService service.QuotesService) *QuotesApplicationService {
+	return &QuotesApplicationService{
 		publisher,
 		quotesService,
 	}
 }
 
-func (svc QuoteApplicationService) CreateUser() {
+func (svc QuotesApplicationService) CreateUser() {
 
 }
 
-func (svc QuoteApplicationService) UpdateUser(userID string) {
+func (svc QuotesApplicationService) UpdateUser(userID string) {
 
 }
 
-func (svc QuoteApplicationService) SubmitQuote(quoteID uuid.UUID) {
+func (svc QuotesApplicationService) SubmitQuote(quoteID uuid.UUID) {
 
 }

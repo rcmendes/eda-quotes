@@ -8,6 +8,10 @@ import (
 	"github.com/google/uuid"
 )
 
+type QuotesService interface {
+	CreateQuote(ctx context.Context, input CreateQuoteInput) (*uuid.UUID, error)
+}
+
 type CreateQuoteInput interface {
 	ID() *uuid.UUID
 	Title() string
@@ -16,12 +20,20 @@ type CreateQuoteInput interface {
 	ServiceProviderID() uuid.UUID
 }
 
-type QuoteService struct {
+type quotesService struct {
 	usersRepo  repository.UsersRepository
 	quotesRepo repository.QuotesRepository
 }
 
-func (svc QuoteService) CreateQuote(ctx context.Context, input CreateQuoteInput) (*uuid.UUID, error) {
+func NewQuotesService(usersRepo repository.UsersRepository,
+	quotesRepo repository.QuotesRepository) QuotesService {
+	return &quotesService{
+		usersRepo,
+		quotesRepo,
+	}
+}
+
+func (svc quotesService) CreateQuote(ctx context.Context, input CreateQuoteInput) (*uuid.UUID, error) {
 	user, err := svc.usersRepo.FindByID(ctx, input.CustomerID())
 	if err != nil {
 		//TODO Add log
@@ -69,6 +81,6 @@ func (svc QuoteService) CreateQuote(ctx context.Context, input CreateQuoteInput)
 	return id, nil
 }
 
-func (svc QuoteService) SubmitQuote(quoteID uuid.UUID) {
+func (svc quotesService) SubmitQuote(quoteID uuid.UUID) {
 
 }

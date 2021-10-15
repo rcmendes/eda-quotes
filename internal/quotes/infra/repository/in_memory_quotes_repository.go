@@ -8,20 +8,20 @@ import (
 	"github.com/google/uuid"
 )
 
-type QuoteInMemoryDB struct {
+type inMemoryQuotesDB struct {
 	quotes map[uuid.UUID]*entity.Quote
 }
 
-func NewQuoteInMemoryDB() *QuoteInMemoryDB {
-	return &QuoteInMemoryDB{}
+func NewInMemoryQuotesDB() repository.QuotesRepository {
+	return &inMemoryQuotesDB{}
 }
 
-func (repo *QuoteInMemoryDB) Save(ctx context.Context, quote entity.Quote) error {
+func (repo *inMemoryQuotesDB) Save(ctx context.Context, quote entity.Quote) error {
 	repo.quotes[quote.ID()] = &quote
 	return nil
 }
 
-func (repo *QuoteInMemoryDB) FindByID(ctx context.Context, id uuid.UUID) (*entity.Quote, error) {
+func (repo *inMemoryQuotesDB) FindByID(ctx context.Context, id uuid.UUID) (*entity.Quote, error) {
 	quote := repo.quotes[id]
 	if quote == nil {
 		return nil, repository.ErrQuoteNotFound(id)

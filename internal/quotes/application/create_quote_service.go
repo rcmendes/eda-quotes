@@ -36,7 +36,7 @@ func (cmd CreateQuoteCommand) ServiceProviderID() uuid.UUID {
 	return cmd.serviceProviderID
 }
 
-func (svc QuoteApplicationService) CreateQuote(
+func (svc QuotesApplicationService) CreateQuote(
 	ctx context.Context,
 	title string,
 	description *string,
