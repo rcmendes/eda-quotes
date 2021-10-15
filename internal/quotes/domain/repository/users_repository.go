@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 
 	"com.github.rcmendes/eda/quotes/internal/quotes/domain"
@@ -9,8 +10,8 @@ import (
 )
 
 type UsersRepository interface {
-	Save(user entity.User) error
-	FindByID(userID uuid.UUID) (*entity.User, error)
+	Save(ctx context.Context, user entity.User) error
+	FindByID(ctx context.Context, userID uuid.UUID) (*entity.User, error)
 }
 
 func ErrUserNotFound(userID uuid.UUID) error {

@@ -7,7 +7,7 @@ import (
 	"com.github.rcmendes/eda/quotes/internal/quotes/infra/repository"
 )
 
-func tearUp() {
+func tearUp() *application.QuoteApplicationService {
 	quotesRepo := repository.NewQuoteInMemoryDB()
 	usersRepo := repository.NewUserInMemoryDB()
 
@@ -16,6 +16,6 @@ func tearUp() {
 	createQuoteHandler := handler.NewCreateQuoteHandler(usersRepo, quotesRepo)
 	publisher.Register("create-quote", createQuoteHandler)
 
-	quoteAppService := application.NewQuoteApplicationService(publisher)
+	return application.NewQuoteApplicationService(publisher)
 
 }

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 
 	"com.github.rcmendes/eda/quotes/internal/quotes/domain"
@@ -9,8 +10,8 @@ import (
 )
 
 type QuotesRepository interface {
-	Save(quote entity.Quote) error
-	FindByID(quoteID uuid.UUID) (*entity.Quote, error)
+	Save(ctx context.Context, quote entity.Quote) error
+	FindByID(ctx context.Context, quoteID uuid.UUID) (*entity.Quote, error)
 }
 
 func ErrQuoteNotFound(quoteID uuid.UUID) error {

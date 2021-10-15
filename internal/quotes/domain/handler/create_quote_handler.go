@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"context"
+
 	"com.github.rcmendes/eda/quotes/internal/common/eda"
 	"com.github.rcmendes/eda/quotes/internal/quotes/application"
 	"com.github.rcmendes/eda/quotes/internal/quotes/domain/entity"
 	"com.github.rcmendes/eda/quotes/internal/quotes/domain/repository"
+	"com.github.rcmendes/eda/quotes/internal/quotes/domain/service"
 )
 
 type CreateQuoteHandler struct {
@@ -22,45 +25,54 @@ func NewCreateQuoteHandler(usersRepo repository.UsersRepository,
 func (svc CreateQuoteHandler) Handle(cmd eda.Command) {
 	switch cmd.(type) {
 	case application.CreateQuoteCommand:
-		svc.createQuote(cmd.(application.CreateQuoteCommand))
+		svc.createQuote(cmd.(service.CreateQuoteInput))
 	default:
 		return
 	}
 }
 
-func (svc CreateQuoteHandler) createQuote(cmd application.CreateQuoteCommand) {
-	user, err := svc.usersRepo.FindByID(cmd.CustomerID)
+func (svc CreateQuoteHandler) createQuote(cmd service.CreateQuoteInput) {
+	ctx := context.Background()
+
+	user, err := svc.usersRepo.FindByID(ctx, cmd.CustomerID())
 	if err != nil {
 		//TODO Add log
-		return nil, err
+		//TODO publish in a queue?
+		// return nil, err
 	}
 	customer := entity.NewCustomerFromUser(*user)
 
-	user, err = svc.usersRepo.FindByID(cmd.ServiceProviderID)
+	user, err = svc.usersRepo.FindByID(ctx, cmd.ServiceProviderID())
 	if err != nil {
 		//TODO Add log
-		return nil, err
+		//TODO publish in a queue?
+		// return nil, err
 	}
 	provider := entity.NewServiceProviderFromUser(*user)
 
 	builder := entity.NewQuoteBuilder()
 
-	builder.ID(cmd.ID)
-	builder.Title(cmd.Title).Customer(*customer).ServiceProvider(*provider)
+	//TODO How to return that to the user?
+	// builder.ID(cmd.ID())
+	builder.Title(cmd.Title()).Customer(*customer).ServiceProvider(*provider)
 
 	//TODO Builder should return a set of errors
 	quote, err := builder.Build()
 	if err != nil {
 		//TODO Add log
-		return nil, err
+		//TODO publish in a queue?
+		// return nil, err
 	}
 
-	err = svc.quotesRepo.Save(*quote)
+	err = svc.quotesRepo.Save(ctx, *quote)
 	if err != nil {
 		//TODO Add log
-		return nil, err
+		//TODO publish in a queue?
+		// return nil, err
 	}
 
-	id := quote.ID()
-	return &id, nil
+	//TODO publish a QuoteCreatedEvent
+
+	// id := quote.ID()
+	// return &id, nil
 }
