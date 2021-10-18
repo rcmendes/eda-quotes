@@ -13,7 +13,7 @@ type inMemoryUsersDB struct {
 }
 
 func NewInMemoryUsersDB() repository.UsersRepository {
-	return &inMemoryUsersDB{}
+	return &inMemoryUsersDB{users: make(map[uuid.UUID]*entity.User)}
 }
 
 func (repo *inMemoryUsersDB) Save(ctx context.Context, user entity.User) error {

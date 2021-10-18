@@ -66,7 +66,8 @@ func (qb QuoteBuilder) Build() (*Quote, error) {
 
 	id := qb.id
 	if id == nil {
-		*id = uuid.New()
+		tmp := uuid.New()
+		id = &tmp
 	}
 
 	quote := &Quote{

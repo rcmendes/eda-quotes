@@ -55,7 +55,7 @@ func NewQuoteTitle(title string) (*QuoteTitle, error) {
 func NewQuoteDescription(description string) (*QuoteDescription, error) {
 	description_length := len(strings.TrimSpace(description))
 
-	if description_length > QUOTE_TITLE_MAX_LENGTH {
+	if description_length > QUOTE_DESCRIPTION_MAX_LENGTH {
 		return nil, ErrQuoteDescriptionLengthOutOfBounds
 	}
 
@@ -74,8 +74,8 @@ type Quote struct {
 	comments    []*Comments
 }
 
-func (qa Quote) ID() uuid.UUID {
-	return qa.id
+func (q Quote) ID() uuid.UUID {
+	return q.id
 }
 
 func (q Quote) Title() QuoteTitle {
@@ -90,56 +90,61 @@ func (q Quote) Status() QuoteStatus {
 	return q.status
 }
 
-func (qa Quote) Customer() Customer {
-	return qa.customer
+func (q Quote) Customer() Customer {
+	return q.customer
 }
 
-func (qa Quote) ServiceProvider() ServiceProvider {
-	return qa.provider
+func (q Quote) ServiceProvider() ServiceProvider {
+	return q.provider
 }
 
-func (qa Quote) Comments() []Comments {
-	comments := make([]Comments, len(qa.comments))
+func (q Quote) Comments() []Comments {
+	comments := make([]Comments, len(q.comments))
 
-	for _, comment := range qa.comments {
+	for _, comment := range q.comments {
 		comments = append(comments, *comment)
 	}
 
 	return comments
 }
 
-func (qa *Quote) ChangeTitle(title QuoteTitle) {
+func (q *Quote) ChangeTitle(title QuoteTitle) {
 
 }
 
-func (qa *Quote) ChangeDescription(description string) {
+func (q *Quote) ChangeDescription(description string) {
 
 }
 
-func (qa *Quote) AddComment(owner Reporter, description string) {
+func (q *Quote) AddComment(owner CommentOwner, description string) {
 
 }
 
-func (qa *Quote) RemoveComment(commentID uuid.UUID) {
+func (q *Quote) RemoveComment(commentID uuid.UUID) {
 
 }
 
-func (qa *Quote) Submit() {
+func (q *Quote) Submit() {
 
 }
 
-func (qa *Quote) Estimate() {
+func (q *Quote) Estimate() {
 
 }
 
-func (qa *Quote) Approve() {
+func (q *Quote) Approve() {
 
 }
 
-func (qa *Quote) Reject() {
+func (q *Quote) Reject() {
 
 }
 
-func (qa *Quote) Cancel() {
+func (q *Quote) Cancel() {
 
+}
+
+func (q Quote) String() string {
+	return fmt.Sprintf("{id: '%s', title: '%s', description: '%s', customer: %s, serviceProvider: %s, status: '%s'}",
+		q.id, q.title, q.description, q.customer, q.provider, q.status.Name())
 }

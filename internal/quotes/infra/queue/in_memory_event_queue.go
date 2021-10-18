@@ -11,7 +11,7 @@ type InMemoryEventPublisher struct {
 }
 
 func NewInMemoryEventPublisher() *InMemoryEventPublisher {
-	return &InMemoryEventPublisher{}
+	return &InMemoryEventPublisher{observers: make(map[string][]eda.EventHandler)}
 }
 
 func (q *InMemoryEventPublisher) Register(commandID string, handler eda.EventHandler) {

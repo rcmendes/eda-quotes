@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 )
 
@@ -22,16 +24,46 @@ func (u User) Email() string {
 	return u.email
 }
 
+func (u User) Equals(other *User) bool {
+	return u.id == other.id && u.email == other.email && u.name == other.name
+}
+
+func (u User) String() string {
+	return fmt.Sprintf("{id=%s, email=%s, name=%s}", u.id, u.email, u.name)
+}
+
 type Customer struct {
 	User
 }
 
-type Reporter struct {
+type CommentOwner struct {
 	User
 }
 
 type ServiceProvider struct {
 	User
+}
+
+func NewUser(id uuid.UUID, email string, name string) *User {
+	return &User{
+		id:    id,
+		email: email,
+		name:  name,
+	}
+}
+
+func NewCustomer(id uuid.UUID, email string, name string) *Customer {
+	return &Customer{
+		User: User{
+			id:    id,
+			email: email,
+			name:  name,
+		},
+	}
+}
+
+func (c Customer) Equals(other *Customer) bool {
+	return other != nil && c.User.Equals(&other.User)
 }
 
 func NewCustomerFromUser(user User) *Customer {
@@ -40,14 +72,42 @@ func NewCustomerFromUser(user User) *Customer {
 	}
 }
 
+func NewServiceProvider(id uuid.UUID, email string, name string) *ServiceProvider {
+	return &ServiceProvider{
+		User: User{
+			id:    id,
+			email: email,
+			name:  name,
+		},
+	}
+}
+
+func (sp ServiceProvider) Equals(other *ServiceProvider) bool {
+	return other != nil && sp.User.Equals(&other.User)
+}
+
 func NewServiceProviderFromUser(user User) *ServiceProvider {
 	return &ServiceProvider{
 		user,
 	}
 }
 
-func NewReporterFromUser(user User) *Reporter {
-	return &Reporter{
+func NewCommentOwner(id uuid.UUID, email string, name string) *CommentOwner {
+	return &CommentOwner{
+		User: User{
+			id:    id,
+			email: email,
+			name:  name,
+		},
+	}
+}
+
+func (co CommentOwner) Equals(other *CommentOwner) bool {
+	return other != nil && co.User.Equals(&other.User)
+}
+
+func NewCommentOwnerFromUser(user User) *CommentOwner {
+	return &CommentOwner{
 		user,
 	}
 }

@@ -18,10 +18,6 @@ func NewQuotesApplicationService(publisher eda.CommandPublisher, quotesService s
 	}
 }
 
-func (svc QuotesApplicationService) CreateUser() {
-
-}
-
 func (svc QuotesApplicationService) UpdateUser(userID string) {
 
 }

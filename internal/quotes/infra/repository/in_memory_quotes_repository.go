@@ -13,7 +13,7 @@ type inMemoryQuotesDB struct {
 }
 
 func NewInMemoryQuotesDB() repository.QuotesRepository {
-	return &inMemoryQuotesDB{}
+	return &inMemoryQuotesDB{quotes: make(map[uuid.UUID]*entity.Quote)}
 }
 
 func (repo *inMemoryQuotesDB) Save(ctx context.Context, quote entity.Quote) error {
@@ -28,4 +28,16 @@ func (repo *inMemoryQuotesDB) FindByID(ctx context.Context, id uuid.UUID) (*enti
 	}
 
 	return quote, nil
+}
+
+func (repo inMemoryQuotesDB) FindByCustomerID(ctx context.Context, customerID uuid.UUID) (*[]entity.Quote, error) {
+	list := make([]entity.Quote, 0)
+
+	for _, q := range repo.quotes {
+		if q.Customer().ID() == customerID {
+			list = append(list, *q)
+		}
+	}
+
+	return &list, nil
 }

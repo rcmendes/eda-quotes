@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 
 	"com.github.rcmendes/eda/quotes/internal/common/eda"
 	"com.github.rcmendes/eda/quotes/internal/quotes/application"
@@ -64,12 +65,14 @@ func (svc CreateQuoteHandler) createQuote(cmd service.CreateQuoteInput) {
 		// return nil, err
 	}
 
-	err = svc.quotesRepo.Save(ctx, *quote)
-	if err != nil {
-		//TODO Add log
-		//TODO publish in a queue?
-		// return nil, err
-	}
+	fmt.Println("\n\nProcessing (Handling) Quote:", quote)
+
+	// err = svc.quotesRepo.Save(ctx, *quote)
+	// if err != nil {
+	//TODO Add log
+	//TODO publish in a queue?
+	// return nil, err
+	// }
 
 	//TODO publish a QuoteCreatedEvent
 

@@ -7,7 +7,7 @@ import (
 type Event interface {
 	EventID() string
 	CreatedAt() time.Time
-	Payload() []byte
+	Payload() string
 }
 
 type EventHandler interface {

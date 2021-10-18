@@ -8,7 +8,7 @@ import (
 
 type Comments struct {
 	id        uuid.UUID
-	owner     Reporter
+	owner     CommentOwner
 	createdAt time.Time
 	content   string
 }
@@ -17,7 +17,7 @@ func (c Comments) ID() uuid.UUID {
 	return c.id
 }
 
-func (c Comments) Owner() Reporter {
+func (c Comments) Owner() CommentOwner {
 	return c.owner
 }
 

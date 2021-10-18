@@ -10,6 +10,7 @@ import (
 
 type QuotesService interface {
 	CreateQuote(ctx context.Context, input CreateQuoteInput) (*uuid.UUID, error)
+	ListQuotesByCustomerID(ctx context.Context, customerID uuid.UUID) (*[]entity.Quote, error)
 }
 
 type CreateQuoteInput interface {
@@ -83,4 +84,8 @@ func (svc quotesService) CreateQuote(ctx context.Context, input CreateQuoteInput
 
 func (svc quotesService) SubmitQuote(quoteID uuid.UUID) {
 
+}
+
+func (svc quotesService) ListQuotesByCustomerID(ctx context.Context, customerID uuid.UUID) (*[]entity.Quote, error) {
+	return svc.quotesRepo.FindByCustomerID(ctx, customerID)
 }

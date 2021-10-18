@@ -2,6 +2,7 @@ package entity
 
 type QuoteStatus interface {
 	Name() string
+	Equals(other QuoteStatus) bool
 }
 
 type quoteStatus struct {
@@ -10,6 +11,10 @@ type quoteStatus struct {
 
 func (qs quoteStatus) Name() string {
 	return qs.name
+}
+
+func (qs quoteStatus) Equals(other QuoteStatus) bool {
+	return other != nil && qs.name == other.Name()
 }
 
 var DraftStatus QuoteStatus = &quoteStatus{"draft"}
