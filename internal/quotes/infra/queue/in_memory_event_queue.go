@@ -6,41 +6,33 @@ import (
 	"com.github.rcmendes/eda/quotes/internal/common/eda"
 )
 
-type InMemoryEventPublisher struct {
-	observers map[string][]eda.EventHandler
+type inMemoryEventQueue struct {
+	handlers map[string]eda.EventHandler
 }
 
-func NewInMemoryEventPublisher() *InMemoryEventPublisher {
-	return &InMemoryEventPublisher{observers: make(map[string][]eda.EventHandler)}
-}
-
-func (q *InMemoryEventPublisher) Register(commandID string, handler eda.EventHandler) {
-	list := q.observers[commandID]
-
-	if list == nil {
-		list = make([]eda.EventHandler, 1)
+func NewInMemoryEventQueue() eda.EventQueue {
+	return &inMemoryEventQueue{
+		handlers: make(map[string]eda.EventHandler),
 	}
-
-	list = append(list, handler)
-
-	q.observers[commandID] = list
 }
 
-func (q InMemoryEventPublisher) Publish(cmd eda.Event) {
-	observers := q.observers[cmd.EventID()]
-	if observers == nil {
+func (q *inMemoryEventQueue) Register(eventID string, handler eda.EventHandler) {
+	q.handlers[eventID] = handler
+}
+
+func (queue inMemoryEventQueue) Publish(evt eda.Event) {
+	handler := queue.handlers[evt.EventID()]
+	if handler == nil {
 		return
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(len(observers))
+	wg.Add(1)
 
-	for _, observer := range observers {
-		go func(wg *sync.WaitGroup, handler eda.EventHandler) {
-			defer wg.Done()
-			handler.Handle(cmd)
-		}(&wg, observer)
-	}
+	go func() {
+		defer wg.Done()
+		handler.Handle(evt)
+	}()
 
 	wg.Wait()
 }

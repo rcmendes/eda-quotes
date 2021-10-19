@@ -32,6 +32,10 @@ func (u User) String() string {
 	return fmt.Sprintf("{id=%s, email=%s, name=%s}", u.id, u.email, u.name)
 }
 
+type CustomerID = uuid.UUID
+type ServiceProviderID = uuid.UUID
+type CommentOwnerID = uuid.UUID
+
 type Customer struct {
 	User
 }
@@ -66,9 +70,9 @@ func (c Customer) Equals(other *Customer) bool {
 	return other != nil && c.User.Equals(&other.User)
 }
 
-func NewCustomerFromUser(user User) *Customer {
+func NewCustomerFromUser(User User) *Customer {
 	return &Customer{
-		user,
+		User,
 	}
 }
 
@@ -86,9 +90,9 @@ func (sp ServiceProvider) Equals(other *ServiceProvider) bool {
 	return other != nil && sp.User.Equals(&other.User)
 }
 
-func NewServiceProviderFromUser(user User) *ServiceProvider {
+func NewServiceProviderFromUser(User User) *ServiceProvider {
 	return &ServiceProvider{
-		user,
+		User,
 	}
 }
 
@@ -106,8 +110,8 @@ func (co CommentOwner) Equals(other *CommentOwner) bool {
 	return other != nil && co.User.Equals(&other.User)
 }
 
-func NewCommentOwnerFromUser(user User) *CommentOwner {
+func NewCommentOwnerFromUser(User User) *CommentOwner {
 	return &CommentOwner{
-		user,
+		User,
 	}
 }

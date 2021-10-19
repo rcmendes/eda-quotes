@@ -34,7 +34,7 @@ func (repo inMemoryQuotesDB) FindByCustomerID(ctx context.Context, customerID uu
 	list := make([]entity.Quote, 0)
 
 	for _, q := range repo.quotes {
-		if q.Customer().ID() == customerID {
+		if q.CustomerID() == customerID {
 			list = append(list, *q)
 		}
 	}

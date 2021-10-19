@@ -10,8 +10,8 @@ type QuoteBuilder struct {
 	id          *uuid.UUID
 	title       string
 	description string
-	customer    *Customer
-	provider    *ServiceProvider
+	customerID  *uuid.UUID
+	providerID  *uuid.UUID
 }
 
 func NewQuoteBuilder() *QuoteBuilder {
@@ -28,13 +28,13 @@ func (qb *QuoteBuilder) Description(description string) *QuoteBuilder {
 	return qb
 }
 
-func (qb *QuoteBuilder) Customer(customer Customer) *QuoteBuilder {
-	qb.customer = &customer
+func (qb *QuoteBuilder) CustomerID(id uuid.UUID) *QuoteBuilder {
+	qb.customerID = &id
 	return qb
 }
 
-func (qb *QuoteBuilder) ServiceProvider(provider ServiceProvider) *QuoteBuilder {
-	qb.provider = &provider
+func (qb *QuoteBuilder) ServiceProviderID(id uuid.UUID) *QuoteBuilder {
+	qb.providerID = &id
 	return qb
 }
 
@@ -54,14 +54,14 @@ func (qb QuoteBuilder) Build() (*Quote, error) {
 		return nil, err
 	}
 
-	if qb.customer == nil {
+	if qb.customerID == nil {
 		//TODO Create custom error (Domain Error)
-		return nil, errors.New("customer was not set")
+		return nil, errors.New("customer ID was not set")
 	}
 
-	if qb.provider == nil {
+	if qb.providerID == nil {
 		//TODO Create custom error (Domain Error)
-		return nil, errors.New("service provider was not set")
+		return nil, errors.New("service provider ID was not set")
 	}
 
 	id := qb.id
@@ -74,8 +74,8 @@ func (qb QuoteBuilder) Build() (*Quote, error) {
 		id:          *id,
 		title:       *title,
 		description: *description,
-		customer:    *qb.customer,
-		provider:    *qb.provider,
+		customerID:  *qb.customerID,
+		providerID:  *qb.providerID,
 		status:      DraftStatus,
 	}
 

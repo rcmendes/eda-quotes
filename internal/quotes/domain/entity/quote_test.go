@@ -106,8 +106,8 @@ func TestShouldSuccessWhenCreatingQuote(t *testing.T) {
 		ID(id).
 		Title(title).
 		Description(description).
-		Customer(*customer).
-		ServiceProvider(*provider).
+		CustomerID(customer.ID()).
+		ServiceProviderID(provider.ID()).
 		Build()
 
 	if err != nil {
@@ -126,12 +126,12 @@ func TestShouldSuccessWhenCreatingQuote(t *testing.T) {
 		t.Errorf("Found Quote Description(%s) != %s.", quote.Description().String(), description)
 	}
 
-	if !quote.Customer().Equals(customer) {
-		t.Errorf("Found Quote Customer(%+v) != (%+v).", quote.Customer(), *customer)
+	if quote.CustomerID() != customer.ID() {
+		t.Errorf("Found Quote Customer ID (%s) != (%s).", quote.CustomerID(), customer.ID())
 	}
 
-	if !quote.ServiceProvider().Equals(provider) {
-		t.Errorf("Found Quote ServiceProvider(%+v) != %+v.", quote.ServiceProvider(), description)
+	if quote.ServiceProviderID() != provider.ID() {
+		t.Errorf("Found Quote ServiceProvider ID(%s) != %s.", quote.ServiceProviderID(), provider.ID())
 	}
 
 	if !quote.Status().Equals(entity.DraftStatus) {
@@ -143,52 +143,3 @@ func TestShouldSuccessWhenCreatingQuote(t *testing.T) {
 		t.Errorf("Found Quote Comments length different than zero: %d.", commentsLength)
 	}
 }
-
-// func TestShouldFailWhenCreatingQuote(t *testing.T) {
-// 	id := uuid.New()
-// 	title := strings.Repeat("x", 5)
-// 	description := "Description"
-// 	customer := entity.NewCustomer(uuid.New(), "customer@test.com", "Customer Name")
-// 	provider := entity.NewServiceProvider(uuid.New(), "provider@test.com", "Service Provider Name")
-
-// 	builder := entity.NewQuoteBuilder()
-// 	_, err := builder.
-// 		ID(id).
-// 		Title(title).
-// 		Description(description).
-// 		Customer(*customer).
-// 		ServiceProvider(*provider).
-// 		Build()
-
-// 	if !errors.Is(err, entity.ErrQuoteTitleLengthOutOfBounds) {
-// 		t.Errorf("Title length should raise an error. Got: %s", err)
-// 	}
-
-// 	title = strings.Repeat("x", 31)
-// 	_, err = builder.
-// 		ID(id).
-// 		Title(title).
-// 		Description(description).
-// 		Customer(*customer).
-// 		ServiceProvider(*provider).
-// 		Build()
-
-// 	if !errors.Is(err, entity.ErrQuoteTitleLengthOutOfBounds) {
-// 		t.Errorf("Title length should raise an error. Got: %s", err)
-// 	}
-
-// 	title = strings.Repeat("x", 6)
-// 	description = strings.Repeat("")
-// 	_, err = builder.
-// 		ID(id).
-// 		Title(title).
-// 		Description(description).
-// 		Customer(*customer).
-// 		ServiceProvider(*provider).
-// 		Build()
-
-// 	if errors.Is(err, entity.ErrQuoteTitleLengthOutOfBounds) {
-// 		t.Errorf("Title length should raise an error. Got: %s", err)
-// 	}
-
-// }

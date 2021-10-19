@@ -6,41 +6,61 @@ import (
 	"com.github.rcmendes/eda/quotes/internal/common/eda"
 )
 
-type InMemoryCommandPublisher struct {
-	observers map[string][]eda.CommandHandler
+type inMemoryCommandPublisher struct {
+	observers map[string]eda.CommandHandler
 }
 
-func NewInMemoryCommandPublisher() *InMemoryCommandPublisher {
-	return &InMemoryCommandPublisher{observers: make(map[string][]eda.CommandHandler)}
+func NewInMemoryCommandQueue() eda.CommandQueue {
+	return &inMemoryCommandPublisher{observers: make(map[string]eda.CommandHandler)}
 }
 
-func (q *InMemoryCommandPublisher) Register(commandID string, handler eda.CommandHandler) {
-	list := q.observers[commandID]
-
-	if len(list) == 0 {
-		list = make([]eda.CommandHandler, 0)
-	}
-
-	list = append(list, handler)
-
-	q.observers[commandID] = list
+func (q *inMemoryCommandPublisher) Register(commandID string, handler eda.CommandHandler) {
+	q.observers[commandID] = handler
 }
 
-func (q InMemoryCommandPublisher) Publish(cmd eda.Command) {
-	observers := q.observers[cmd.CommandID()]
-	if len(observers) == 0 {
+func (q inMemoryCommandPublisher) PublishAndForget(cmd eda.Command) {
+	handler := q.observers[cmd.CommandID()]
+	if handler == nil {
 		return
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(len(observers))
+	wg.Add(1)
 
-	for _, observer := range observers {
-		go func(wg *sync.WaitGroup, handler eda.CommandHandler) {
-			defer wg.Done()
-			handler.Handle(cmd)
-		}(&wg, observer)
+	go func() {
+		defer wg.Done()
+		handler.Handle(cmd)
+	}()
+
+	wg.Wait()
+}
+
+func (q inMemoryCommandPublisher) Publish(cmd eda.Command, result chan interface{}, err chan error) {
+	handler := q.observers[cmd.CommandID()]
+	if handler == nil {
+		return
 	}
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func() {
+		defer func() {
+			close(result)
+			close(err)
+			wg.Done()
+		}()
+
+		res, e := handler.Handle(cmd)
+		if res != nil {
+			result <- res
+		}
+
+		if e != nil {
+			err <- e
+		}
+
+	}()
 
 	wg.Wait()
 }

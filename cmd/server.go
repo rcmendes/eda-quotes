@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"reflect"
 	"time"
 
 	"com.github.rcmendes/eda/quotes/internal/quotes/application"
 	"com.github.rcmendes/eda/quotes/internal/quotes/domain/entity"
-	"com.github.rcmendes/eda/quotes/internal/quotes/domain/handler"
-	"com.github.rcmendes/eda/quotes/internal/quotes/domain/service"
 	"com.github.rcmendes/eda/quotes/internal/quotes/infra/queue"
 	"com.github.rcmendes/eda/quotes/internal/quotes/infra/repository"
 	"github.com/google/uuid"
@@ -21,7 +20,12 @@ var id3 = uuid.New()
 var id4 = uuid.New()
 var id5 = uuid.New()
 
-func tearUp() *application.QuotesApplicationService {
+type app struct {
+	createQuote          application.CreateQuoteHandler
+	listQuotesByCustomer application.ListAllQuotesByCustomer
+}
+
+func tearUp() *app {
 	quotesRepo := repository.NewInMemoryQuotesDB()
 	usersRepo := repository.NewInMemoryUsersDB()
 
@@ -39,13 +43,17 @@ func tearUp() *application.QuotesApplicationService {
 	u5 := entity.NewUser(id5, "user5@test.com", "User 5")
 	usersRepo.Save(ctx, *u5)
 
-	publisher := queue.NewInMemoryCommandPublisher()
-	createQuoteHandler := handler.NewCreateQuoteHandler(usersRepo, quotesRepo)
-	publisher.Register("create-quote", createQuoteHandler)
+	eventQueue := queue.NewInMemoryEventQueue()
+	eventLoggerHandler := application.NewEventLoggerHandler()
+	eventQueue.Register("quote-created-event", eventLoggerHandler)
 
-	quotesService := service.NewQuotesService(usersRepo, quotesRepo)
+	createQuoteHandler := application.NewCreateQuoteHandler(quotesRepo, eventQueue)
+	listQuotesByCustomerHandler := application.NewListQuotesByCustomer(quotesRepo, usersRepo)
 
-	return application.NewQuotesApplicationService(publisher, quotesService)
+	return &app{
+		createQuote:          createQuoteHandler,
+		listQuotesByCustomer: listQuotesByCustomerHandler,
+	}
 
 }
 
@@ -55,20 +63,24 @@ func main() {
 	ctx := context.Background()
 
 	description := "description 1"
-	id, err := app.CreateQuote(ctx, "title 1", &description, id1, id4)
+	q := application.NewCreateQuoteCommand("title 1", id1, id3, &description)
+	fmt.Println("\n\ncmd TYPE:", reflect.TypeOf(q))
+	id, err := app.createQuote.Handle(ctx, *q)
 	fmt.Printf("\nID:%s, err: %+v", id, err)
 
 	description = "description 2"
-	id, err = app.CreateQuote(ctx, "title 2", &description, id2, id5)
+	q = application.NewCreateQuoteCommand("title 2", id2, id4, &description)
+	id, err = app.createQuote.Handle(ctx, *q)
 	fmt.Printf("\nID:%s, err: %+v", id, err)
 
 	description = "description 3"
-	id, err = app.CreateQuote(ctx, "title 3", &description, id3, id4)
+	q = application.NewCreateQuoteCommand("title 3", id3, id5, &description)
+	id, err = app.createQuote.Handle(ctx, *q)
 	fmt.Printf("\nID:%s, err: %+v", id, err)
 
 	fmt.Println("\nLIST OF QUOTES:")
 
-	quotes, err := app.ListAllQuotesOfCustomer(ctx, id1)
+	quotes, err := app.listQuotesByCustomer.Handle(ctx, id1)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -76,7 +88,7 @@ func main() {
 		fmt.Printf("\n - %s", q)
 	}
 
-	quotes, err = app.ListAllQuotesOfCustomer(ctx, id2)
+	quotes, err = app.listQuotesByCustomer.Handle(ctx, id2)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -84,7 +96,7 @@ func main() {
 		fmt.Printf("\n - %s", q)
 	}
 
-	quotes, err = app.ListAllQuotesOfCustomer(ctx, id3)
+	quotes, err = app.listQuotesByCustomer.Handle(ctx, id3)
 	if err != nil {
 		log.Fatalln(err)
 	}

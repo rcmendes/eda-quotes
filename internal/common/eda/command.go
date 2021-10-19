@@ -5,5 +5,5 @@ type Command interface {
 }
 
 type CommandHandler interface {
-	Handle(command Command)
+	Handle(command Command) (result interface{}, err error)
 }

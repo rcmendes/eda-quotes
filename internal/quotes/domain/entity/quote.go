@@ -64,13 +64,14 @@ func NewQuoteDescription(description string) (*QuoteDescription, error) {
 	return qt, nil
 }
 
+type QuoteID = uuid.UUID
 type Quote struct {
-	id          uuid.UUID
+	id          QuoteID
 	title       QuoteTitle
 	description QuoteDescription
 	status      QuoteStatus
-	customer    Customer
-	provider    ServiceProvider
+	customerID  CustomerID
+	providerID  ServiceProviderID
 	comments    []*Comments
 }
 
@@ -90,12 +91,12 @@ func (q Quote) Status() QuoteStatus {
 	return q.status
 }
 
-func (q Quote) Customer() Customer {
-	return q.customer
+func (q Quote) CustomerID() CustomerID {
+	return q.customerID
 }
 
-func (q Quote) ServiceProvider() ServiceProvider {
-	return q.provider
+func (q Quote) ServiceProviderID() ServiceProviderID {
+	return q.providerID
 }
 
 func (q Quote) Comments() []Comments {
@@ -145,6 +146,6 @@ func (q *Quote) Cancel() {
 }
 
 func (q Quote) String() string {
-	return fmt.Sprintf("{id: '%s', title: '%s', description: '%s', customer: %s, serviceProvider: %s, status: '%s'}",
-		q.id, q.title, q.description, q.customer, q.provider, q.status.Name())
+	return fmt.Sprintf("{ID: '%s', title: '%s', description: '%s', customerID: %s, serviceProviderID: %s, status: '%s'}",
+		q.id, q.title, q.description, q.customerID, q.providerID, q.status.Name())
 }
